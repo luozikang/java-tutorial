@@ -7,31 +7,36 @@ import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Member;
 import java.util.Map;
 
+/**
+ * https://github.com/orphan-oss/ognl
+ */
 public class OgnlTest {
 
     //创建一个Ognl上下文对象
-    static OgnlContext context = new OgnlContext(new DefaultClassResolver(),new DefaultTypeConverter(),new  MemberAccess(){
+//    static OgnlContext context = new OgnlContext(new DefaultClassResolver(), new DefaultTypeConverter(), new MemberAccess() {
+//
+//        @Override
+//        public Object setup(Map map, Object o, Member member, String s) {
+//            AccessibleObject accessible = (AccessibleObject) member;
+//            if (!accessible.isAccessible()) {
+//
+//                accessible.setAccessible(true);
+//            }
+//            return true;
+//        }
+//
+//        @Override
+//        public void restore(Map map, Object o, Member member, String s, Object o1) {
+//
+//        }
+//
+//        @Override
+//        public boolean isAccessible(Map map, Object o, Member member, String s) {
+//            return true;
+//        }
+//    });
+    static OgnlContext context = (OgnlContext) Ognl.createDefaultContext(null);
 
-        @Override
-        public Object setup(Map map, Object o, Member member, String s) {
-            AccessibleObject accessible = (AccessibleObject) member;
-            if (!accessible.isAccessible()) {
-
-                accessible.setAccessible(true);
-            }
-            return true;
-        }
-
-        @Override
-        public void restore(Map map, Object o, Member member, String s, Object o1) {
-
-        }
-
-        @Override
-        public boolean isAccessible(Map map, Object o, Member member, String s) {
-            return true;
-        }
-    });
     //非根元素
     @Test
     public void testOgnl1() throws OgnlException {
@@ -41,9 +46,9 @@ public class OgnlTest {
          * 1.OgnlContext放入基本变量数据
          */
         //放入数据
-        context.put("cn","China");
+        context.put("cn", "China");
         //获取数据（map）
-        String value = (String)context.get("cn");
+        String value = (String) context.get("cn");
 
         System.out.println(value);
 
@@ -56,7 +61,7 @@ public class OgnlTest {
         user.setId(100);
         user.setName("Jack");
         //【往非根元素放入数据，取值的时候表达式要用“#”】
-        context.put("user",user);
+        context.put("user", user);
         //获取对象属性
         //使用这种方式也可以获取
         Object s = context.get("user");
@@ -100,7 +105,7 @@ public class OgnlTest {
 
     //ognl对静态方法调用的支持
     @Test
-    public void testOgnl3() throws Exception{
+    public void testOgnl3() throws Exception {
 
 
         //Ognl表达式语言，调用类的静态方法
@@ -109,6 +114,17 @@ public class OgnlTest {
         Object ognl = Ognl.parseExpression("@@floor(10.9)");
         Object value = Ognl.getValue(ognl, context, context.getRoot());
         System.out.println(value);
+    }
+    
+    
+    @Test
+    public void testOgnl4() throws OgnlException {
+        User user = new User();
+        Object value = Ognl.getValue(Ognl.parseExpression("id=10"),user);
+        Ognl.getValue(Ognl.parseExpression("name=\"你好\""),user);
+        System.out.println(value);
+        System.out.println(user);
+
     }
 
 }
